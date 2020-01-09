@@ -10,6 +10,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -49,6 +50,7 @@ public class Clock {
 	public void renderClock(ClockPane pane) {
 		renderClockCircle(pane);
 		renderHours(pane);
+		renderClockArms(pane);
 	}
 
 	/*
@@ -78,7 +80,7 @@ public class Clock {
 		}
 	}
 
-	public void renderClockCircle(ClockPane pane) {
+	private void renderClockCircle(ClockPane pane) {
 		radius = Math.min(pane.getW(), pane.getH()) * 0.4;
 		double centerX = pane.getW() / 2;
 		double centerY = pane.getH() / 2;
@@ -90,6 +92,23 @@ public class Clock {
 		circle.setStroke(Color.rgb(228, 221, 182, 0.99));
 		circle.setStrokeWidth(10);
 		pane.getChildren().add(circle);
+	}
+	
+	private void renderClockArms(ClockPane pane) {
+		//355 at 3pm; += 30 per hour
+		int rotation = 355 + (this.hour * 30);
+		DoubleBinding x = pane.widthProperty().divide(2);
+		DoubleBinding y = pane.heightProperty().divide(2);
+		DoubleBinding endX = x.add(Math.cos(Math.toRadians(rotation)) * (radius - radius * 0.14)).subtract(radius * 0.076);
+		DoubleBinding endY = y.add(Math.sin(Math.toRadians(rotation)) * (radius - radius * 0.14)).add(radius * 0.066);
+		Line hourHand = new Line(0,0,0,0);
+		hourHand.startXProperty().bind(x);
+		hourHand.startYProperty().bind(y);
+		hourHand.endXProperty().bind(endX);
+		hourHand.endYProperty().bind(endY);
+		hourHand.setStrokeWidth(5);
+		hourHand.setStroke(Color.GREEN);
+		pane.getChildren().add(hourHand);
 	}
 
 }
