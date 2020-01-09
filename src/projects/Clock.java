@@ -5,9 +5,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.DoubleProperty;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 public class Clock {
@@ -19,11 +23,10 @@ public class Clock {
 	private int second;
 	private double radius;
 
-
 	public Clock() {
 		Calendar calendar = new GregorianCalendar();
 		this.year = calendar.get(Calendar.YEAR);
-		this.month = calendar.get(Calendar.MONTH);
+		this.month = calendar.get(Calendar.MONTH) + 1;
 		this.day = calendar.get(Calendar.DAY_OF_MONTH);
 	}
 
@@ -42,46 +45,51 @@ public class Clock {
 	public String getTimeString() {
 		return "Current Date: " + this.month + "-" + this.day + "-" + this.year;
 	}
-	
+
 	public void renderClock(ClockPane pane) {
 		renderClockCircle(pane);
 		renderHours(pane);
 	}
-	
+
+	/*
+	 * offset = pane.getW() / 2; x = offset + Math.cos(Math.toRadians(rotation)) *
+	 * radiusOffset; y = offset + Math.sin(Math.toRadians(rotation)) * radiusOffset;
+	 */
 	private void renderHours(ClockPane pane) {
-		
+
+		//starts rotation at 60`
 		double rotation = 300;
-		double offset = pane.getW() / 2;
-		//-10 to make digits circle fit within clock circle
-		double radiusOffset = radius - 10;
+		// makes digit's circle fit within the outer circle
+		double radiusOffset = radius - radius * 0.14;
+		DoubleBinding offsetx = pane.widthProperty().divide(2);
+		DoubleBinding offsety = pane.heightProperty().divide(2);
+
 		// Loop through 12 hour digits
 		for (int i = 1; i < 13; i++) {
-			double x = offset + Math.cos(Math.toRadians(rotation)) * radiusOffset;
-			double y = offset + Math.sin(Math.toRadians(rotation)) * radiusOffset;
-			Text text = new Text(x, y, i + "");
-			text.xProperty().bind((pane.widthProperty().divide(2)).add(Math.cos(Math.toRadians(rotation)) * radiusOffset).subtract(6));
-			text.yProperty().bind((pane.heightProperty().divide(2)).add(Math.sin(Math.toRadians(rotation)) * radiusOffset).add(5));
+			Text text = new Text(i + "");
+			DoubleBinding x = offsetx.add(Math.cos(Math.toRadians(rotation)) * radiusOffset).subtract(radius * 0.076);
+			DoubleBinding y = offsety.add(Math.sin(Math.toRadians(rotation)) * radiusOffset).add(radius * 0.066);
+			text.xProperty().bind(x);
+			text.yProperty().bind(y);
+			text.setFont(Font.font("Actor", FontWeight.BOLD, pane.getW() * 0.08));
+			text.setFill(Color.WHITE);
 			pane.getChildren().add(text);
 			rotation += 30;
 		}
 	}
-	
+
 	public void renderClockCircle(ClockPane pane) {
-		
-		radius = Math.min(pane.getW(), pane.getH()) * 0.8 * 0.5;
+		radius = Math.min(pane.getW(), pane.getH()) * 0.4;
 		double centerX = pane.getW() / 2;
 		double centerY = pane.getH() / 2;
 		Circle circle = new Circle(centerX, centerY, radius);
 
 		circle.centerXProperty().bind(pane.widthProperty().divide(2));
 		circle.centerYProperty().bind(pane.heightProperty().divide(2));
-		circle.setFill(Color.WHITE);
-		circle.setStroke(Color.AQUAMARINE);
+		circle.setFill(Color.rgb(182, 223, 228, 0.99));
+		circle.setStroke(Color.rgb(228, 221, 182, 0.99));
+		circle.setStrokeWidth(10);
 		pane.getChildren().add(circle);
 	}
-	
-	
-	
-	
-	
+
 }

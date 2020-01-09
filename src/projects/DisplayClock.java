@@ -40,14 +40,14 @@ public class DisplayClock extends Application {
 		
 		BorderPane pane = new BorderPane();
 		pane.setTop(title);
-		pane.setCenter(new ClockPane(clock, 250, 250));
+		pane.setCenter(new ClockPane(clock, 450, 450));
 		pane.setBottom(lblCurrentTime);
 		
 		BorderPane.setAlignment(lblCurrentTime, Pos.TOP_CENTER);
 		BorderPane.setAlignment(title, Pos.TOP_CENTER);
 
 		
-		Scene scene = new Scene(pane, 250, 250);
+		Scene scene = new Scene(pane, 550, 550);
 		primaryStage.setTitle("Clock");
 		primaryStage.setScene(scene);
 		primaryStage.show();
