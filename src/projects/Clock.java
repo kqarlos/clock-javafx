@@ -11,6 +11,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.shape.StrokeLineJoin;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -46,7 +48,8 @@ public class Clock {
 	}
 
 	public String getTimeString() {
-		return "Current Date: " + this.month + "-" + this.day + "-" + this.year + "- hour: " + this.hour + "min: " + this.minute;
+		return "Current Date: " + this.month + "-" + this.day + "-" + this.year + "- hour: " + this.hour + "min: "
+				+ this.minute;
 	}
 
 	public void renderClock(ClockPane pane) {
@@ -98,31 +101,32 @@ public class Clock {
 
 	private void renderClockArms(ClockPane pane) {
 		// 295 at 1pm; += 30 per hour
-		int hourRotation = 295 + ((this.hour - 1) * 30);
+		int hourRotation = 300 + ((this.hour - 1) * 30);
 		DoubleBinding x = pane.widthProperty().divide(2);
 		DoubleBinding y = pane.heightProperty().divide(2);
-		DoubleBinding endX = x.add(Math.cos(Math.toRadians(hourRotation)) * (radius - radius * 0.14))
-				.subtract(radius * 0.076);
-		DoubleBinding endY = y.add(Math.sin(Math.toRadians(hourRotation)) * (radius - radius * 0.14)).add(radius * 0.066);
+		DoubleBinding endX = x.add(Math.cos(Math.toRadians(hourRotation)) * (radius - radius * 0.14));
+		DoubleBinding endY = y.add(Math.sin(Math.toRadians(hourRotation)) * (radius - radius * 0.14));
 		Line hourHand = new Line(0, 0, 0, 0);
 		hourHand.startXProperty().bind(x);
 		hourHand.startYProperty().bind(y);
 		hourHand.endXProperty().bind(endX);
 		hourHand.endYProperty().bind(endY);
 		hourHand.setStrokeWidth(5);
+		hourHand.setStrokeLineCap(StrokeLineCap.ROUND);
 		hourHand.setStroke(Color.GREEN);
 		pane.getChildren().add(hourHand);
 
-		// 270 at 0 mins += 6 per min
-		int minRotation = 270 + (this.minute * 6);
-		DoubleBinding minEndX = x.add(Math.cos(Math.toRadians(minRotation)) * (radius - radius * 0.14)).subtract(radius * 0.076);
-		DoubleBinding minEndY = y.add(Math.sin(Math.toRadians(minRotation)) * (radius - radius * 0.14)).add(radius * 0.066);
-		Line minHand = new Line(0,0,0,0);
+		// 265 at 0 mins += 6 per min
+		int minRotation = 300 + ((this.minute - 5) * 6);
+		DoubleBinding minEndX = x.add(Math.cos(Math.toRadians(minRotation)) * (radius - radius * 0.14));
+		DoubleBinding minEndY = y.add(Math.sin(Math.toRadians(minRotation)) * (radius - radius * 0.14));
+		Line minHand = new Line(0, 0, 0, 0);
 		minHand.startXProperty().bind(x);
 		minHand.startYProperty().bind(y);
 		minHand.endXProperty().bind(minEndX);
 		minHand.endYProperty().bind(minEndY);
 		minHand.setStrokeWidth(3);
+		hourHand.setStrokeLineCap(StrokeLineCap.ROUND);
 		minHand.setStroke(Color.GREEN);
 		pane.getChildren().add(minHand);
 	}
