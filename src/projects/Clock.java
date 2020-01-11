@@ -33,6 +33,7 @@ public class Clock {
 		this.day = calendar.get(Calendar.DAY_OF_MONTH);
 		this.hour = calendar.get(Calendar.HOUR);
 		this.minute = calendar.get(Calendar.MINUTE);
+		this.second = calendar.get(Calendar.SECOND);
 	}
 
 	private int getDay() {
@@ -67,7 +68,7 @@ public class Clock {
 		// starts rotation at 30 degrees + 30 degrees per hour
 		double rotation = 300;
 		// makes digit's circle fit within the outer circle
-		double radiusOffset = radius - radius * 0.14;
+		double radiusOffset = radius - radius * 0.15;
 		DoubleBinding offsetx = pane.widthProperty().divide(2);
 		DoubleBinding offsety = pane.heightProperty().divide(2);
 
@@ -102,10 +103,12 @@ public class Clock {
 	private void renderClockArms(ClockPane pane) {
 		// 295 at 1pm; += 30 per hour
 		int hourRotation = 300 + ((this.hour - 1) * 30);
+		double hourRadiusOffset = radius - radius * 0.50;
 		DoubleBinding x = pane.widthProperty().divide(2);
 		DoubleBinding y = pane.heightProperty().divide(2);
-		DoubleBinding endX = x.add(Math.cos(Math.toRadians(hourRotation)) * (radius - radius * 0.14));
-		DoubleBinding endY = y.add(Math.sin(Math.toRadians(hourRotation)) * (radius - radius * 0.14));
+		DoubleBinding endX = x.add(Math.cos(Math.toRadians(hourRotation)) * hourRadiusOffset);
+		DoubleBinding endY = y.add(Math.sin(Math.toRadians(hourRotation)) * hourRadiusOffset);
+		//create hour hand
 		Line hourHand = new Line(0, 0, 0, 0);
 		hourHand.startXProperty().bind(x);
 		hourHand.startYProperty().bind(y);
@@ -113,13 +116,15 @@ public class Clock {
 		hourHand.endYProperty().bind(endY);
 		hourHand.setStrokeWidth(5);
 		hourHand.setStrokeLineCap(StrokeLineCap.ROUND);
-		hourHand.setStroke(Color.GREEN);
+		hourHand.setStroke(Color.rgb(104, 137, 128, 0.99));
 		pane.getChildren().add(hourHand);
 
 		// 265 at 0 mins += 6 per min
 		int minRotation = 300 + ((this.minute - 5) * 6);
-		DoubleBinding minEndX = x.add(Math.cos(Math.toRadians(minRotation)) * (radius - radius * 0.14));
-		DoubleBinding minEndY = y.add(Math.sin(Math.toRadians(minRotation)) * (radius - radius * 0.14));
+		double minRadiusOffset = radius - radius * 0.40;
+		DoubleBinding minEndX = x.add(Math.cos(Math.toRadians(minRotation)) * minRadiusOffset);
+		DoubleBinding minEndY = y.add(Math.sin(Math.toRadians(minRotation)) * minRadiusOffset);
+		//create min hand
 		Line minHand = new Line(0, 0, 0, 0);
 		minHand.startXProperty().bind(x);
 		minHand.startYProperty().bind(y);
@@ -127,8 +132,34 @@ public class Clock {
 		minHand.endYProperty().bind(minEndY);
 		minHand.setStrokeWidth(3);
 		hourHand.setStrokeLineCap(StrokeLineCap.ROUND);
-		minHand.setStroke(Color.GREEN);
+		minHand.setStroke(Color.rgb(104, 137, 128, 0.99));
 		pane.getChildren().add(minHand);
+		
+		// 265 at 0 secs += 6 per sec
+		int secRotation = 300 + ((this.second - 5) * 6);
+		double secRadiusOffset = radius - radius * 0.30;
+		DoubleBinding secEndX = x.add(Math.cos(Math.toRadians(secRotation)) * secRadiusOffset);
+		DoubleBinding secEndY = y.add(Math.sin(Math.toRadians(secRotation)) * secRadiusOffset);
+		//create sec hand
+		Line secHand = new Line(0, 0, 0, 0);
+		secHand.startXProperty().bind(x);
+		secHand.startYProperty().bind(y);
+		secHand.endXProperty().bind(secEndX);
+		secHand.endYProperty().bind(secEndY);
+		secHand.setStrokeWidth(1);
+		secHand.setStrokeLineCap(StrokeLineCap.ROUND);
+		secHand.setStroke(Color.rgb(104, 137, 128, 0.99));
+		pane.getChildren().add(secHand);
+		
+		Line dot = new Line(0,0,0,0);
+		dot.startXProperty().bind(x);
+		dot.startYProperty().bind(y);
+		dot.endXProperty().bind(x);
+		dot.endYProperty().bind(y);
+		dot.setStrokeWidth(25);
+		dot.setStrokeLineCap(StrokeLineCap.ROUND);
+		dot.setStroke(Color.rgb(104, 137, 128, 0.99));
+		pane.getChildren().add(dot);
 	}
 
 }
