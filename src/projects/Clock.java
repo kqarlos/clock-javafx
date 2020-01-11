@@ -4,7 +4,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.layout.Pane;
@@ -17,6 +20,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
+/*
+ * Clock with current date and time
+ * Clock renders into a pane and updates its properties every second
+ */
 public class Clock {
 	private int year;
 	private int month;
@@ -26,6 +33,9 @@ public class Clock {
 	private int second;
 	private double radius;
 
+	/*
+	 * Creates a clock object with current time attributes
+	 */
 	public Clock() {
 		Calendar calendar = new GregorianCalendar();
 		this.year = calendar.get(Calendar.YEAR);
@@ -48,20 +58,52 @@ public class Clock {
 		return this.year;
 	}
 
+	/*
+	 * @return String with current date
+	 */
 	public String getTimeString() {
-		return "Current Date: " + this.month + "-" + this.day + "-" + this.year + "- hour: " + this.hour + "min: "
-				+ this.minute;
+		return "Current Date: " + this.month + "-" + this.day + "-" + this.year;
 	}
 
+	/*
+	 * Calls to update and render clock every second
+	 */
 	public void renderClock(ClockPane pane) {
-		renderClockCircle(pane);
-		renderHours(pane);
-		renderClockArms(pane);
+		Timer timer = new Timer();
+		TimerTask task = new TimerTask() {
+			public void run() {
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						update();
+						renderClockCircle(pane);
+						renderHours(pane);
+						renderClockArms(pane);
+					}
+				});
+			}
+		};
+		timer.scheduleAtFixedRate(task, 0, 1000l);
+	}
+
+	/*
+	 * Updates clock properties
+	 */
+	public void update() {
+		Calendar calendar = new GregorianCalendar();
+		this.year = calendar.get(Calendar.YEAR);
+		this.month = calendar.get(Calendar.MONTH) + 1;
+		this.day = calendar.get(Calendar.DAY_OF_MONTH);
+		this.hour = calendar.get(Calendar.HOUR);
+		this.minute = calendar.get(Calendar.MINUTE);
+		this.second = calendar.get(Calendar.SECOND);
 	}
 
 	/*
 	 * offset = pane.getW() / 2; x = offset + Math.cos(Math.toRadians(rotation)) *
 	 * radiusOffset; y = offset + Math.sin(Math.toRadians(rotation)) * radiusOffset;
+	 * Renders digits on clock pane
+	 * @param ClockPane
 	 */
 	private void renderHours(ClockPane pane) {
 
@@ -86,6 +128,10 @@ public class Clock {
 		}
 	}
 
+	/*
+	 * Renders clock circle
+	 * @param ClockPane
+	 */
 	private void renderClockCircle(ClockPane pane) {
 		radius = Math.min(pane.getW(), pane.getH()) * 0.4;
 		double centerX = pane.getW() / 2;
@@ -100,6 +146,10 @@ public class Clock {
 		pane.getChildren().add(circle);
 	}
 
+	/*
+	 * Renders clock arms
+	 * @param ClockPane
+	 */
 	private void renderClockArms(ClockPane pane) {
 		// 295 at 1pm; += 30 per hour
 		int hourRotation = 300 + ((this.hour - 1) * 30);
@@ -108,7 +158,7 @@ public class Clock {
 		DoubleBinding y = pane.heightProperty().divide(2);
 		DoubleBinding endX = x.add(Math.cos(Math.toRadians(hourRotation)) * hourRadiusOffset);
 		DoubleBinding endY = y.add(Math.sin(Math.toRadians(hourRotation)) * hourRadiusOffset);
-		//create hour hand
+		// create hour hand
 		Line hourHand = new Line(0, 0, 0, 0);
 		hourHand.startXProperty().bind(x);
 		hourHand.startYProperty().bind(y);
@@ -124,7 +174,7 @@ public class Clock {
 		double minRadiusOffset = radius - radius * 0.40;
 		DoubleBinding minEndX = x.add(Math.cos(Math.toRadians(minRotation)) * minRadiusOffset);
 		DoubleBinding minEndY = y.add(Math.sin(Math.toRadians(minRotation)) * minRadiusOffset);
-		//create min hand
+		// create min hand
 		Line minHand = new Line(0, 0, 0, 0);
 		minHand.startXProperty().bind(x);
 		minHand.startYProperty().bind(y);
@@ -134,13 +184,13 @@ public class Clock {
 		hourHand.setStrokeLineCap(StrokeLineCap.ROUND);
 		minHand.setStroke(Color.rgb(104, 137, 128, 0.99));
 		pane.getChildren().add(minHand);
-		
+
 		// 265 at 0 secs += 6 per sec
 		int secRotation = 300 + ((this.second - 5) * 6);
 		double secRadiusOffset = radius - radius * 0.30;
 		DoubleBinding secEndX = x.add(Math.cos(Math.toRadians(secRotation)) * secRadiusOffset);
 		DoubleBinding secEndY = y.add(Math.sin(Math.toRadians(secRotation)) * secRadiusOffset);
-		//create sec hand
+		// create sec hand
 		Line secHand = new Line(0, 0, 0, 0);
 		secHand.startXProperty().bind(x);
 		secHand.startYProperty().bind(y);
@@ -150,8 +200,8 @@ public class Clock {
 		secHand.setStrokeLineCap(StrokeLineCap.ROUND);
 		secHand.setStroke(Color.rgb(104, 137, 128, 0.99));
 		pane.getChildren().add(secHand);
-		
-		Line dot = new Line(0,0,0,0);
+
+		Line dot = new Line(0, 0, 0, 0);
 		dot.startXProperty().bind(x);
 		dot.startYProperty().bind(y);
 		dot.endXProperty().bind(x);

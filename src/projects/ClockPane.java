@@ -9,13 +9,17 @@ import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.shape.Line;
 
+/*
+ * Clock pane tailored for the clock
+ */
 class ClockPane extends Pane {
 
 	private Clock clock;
 	private double w, h;
 
-	//class
-	
+	/*
+	 * Creates a new clock pane tailored for the clock
+	 */
 	public ClockPane(Clock clock, double w, double h) {
 		this.w = w;
 		this.h = h;
